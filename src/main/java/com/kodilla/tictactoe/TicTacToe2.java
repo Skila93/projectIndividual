@@ -1,214 +1,212 @@
 package com.kodilla.tictactoe;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.application.Platform;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class TicTacToe2 extends Application {
+    private static List<Button> cells = new ArrayList<>();
+
+    private static List<Boolean> filledCells = new ArrayList<>(9);
+
+    private computerMoves aiLogic;
+
+    private Label statusLabel;
+
     private Image background = new Image("file:src/main/resources/Table_tictactoe.jpg");
     private Image notebookPage = new Image("file:src/main/resources/Notebook_page.jpg");
-    private char whichPlayersTurn = 'X';//Początek gry, zaczyna
 
-    public Cell[][] cell =  new Cell[3][3];
+    public TicTacToe2() {
+        statusLabel = new Label("");
+        aiLogic = new Computer();
 
-    Label lblStatus = new Label("Player X turn");
-
+        for (int i = 0; i < 9; i++) {
+            filledCells.add(false);
+        }
+        clearBoardArray();
+    }
 
     @Override
-    public void start(Stage primaryStage) {
-
-        Label labelTittle = new Label("Tic Tac Toe");
-        Button chooseX = new Button("Choose X");
-        Button chooseO = new Button("Choose O");
-        Button exit = new Button("Exit");
-        Button play = new Button("START GAME");//Przyciski na górze ekranu, stworzenie i czcionka
-        play.setMinSize(400,120);
-        play.setStyle("-fx-background-color: transparent;");
-        Button scoreBoard = new Button("Scoreboard");
-        chooseX.setFont(new Font(25));
-        chooseO.setFont(new Font(25));
-        exit.setFont(new Font(25));
-        play.setFont(new Font(50));
-        scoreBoard.setFont(new Font(25));
-        labelTittle.setFont(new Font(40));
-        labelTittle.setStyle("-fx-text-fill: white;");
-
-        exit.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent e) {//USTAWIENIE AKCJI NA PRZYCISK EXIT
-                Platform.exit();
+    public void start(Stage primaryStage) throws Exception {
+        GridPane pane = new GridPane();
+            ColumnConstraints c1 = new ColumnConstraints(125);
+            RowConstraints r1 = new RowConstraints(125);
+            pane.getColumnConstraints().addAll(c1, c1, c1);
+            pane.getRowConstraints().addAll(r1, r1, r1);
+            for (int i = 0; i < 9; i++) {
+                pane.add(Cell(), i % 3, i / 3);
             }
-        });
-        GridPane pane = new GridPane();//Dodanie wszystkich komórek
-        for (int i = 0; i < 3; i++){
-            for (int j = 0; j < 3; j++){
-                pane.add(cell[i][j] = new Cell(), j, i);
-            }
-        }
-        BackgroundSize backgroundSize = new BackgroundSize(100, 50, true, true, true, true);
-        BackgroundImage backgroundImage = new BackgroundImage(notebookPage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
-        pane.setBackground(new Background(backgroundImage));
 
         BackgroundSize backgroundSize2 = new BackgroundSize(1000, 800, true, true, true, true);
-        BackgroundImage backgroundImage2 = new BackgroundImage(background, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize2);
+        BackgroundImage backgroundTable = new BackgroundImage(background, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize2);
+        Button startButton = new Button("Start game");
+        startButton.setFont(new Font(40));
 
-        BorderPane borderPane = new BorderPane();//Stworzenie BorderPane(Layout z center, top, bottom, left i right)
-        borderPane.setCenter(pane);//Ustawienie pane czyli GridPane(pola gry) jako center
-        lblStatus.setStyle("-fx-text-fill: white;");
-        borderPane.setBottom(lblStatus);//Ustawienie bottom jako komunikatu czyja kolej
-        borderPane.setBackground(new Background(backgroundImage2));
 
-        VBox buttonBar = new VBox();//Stworzenie belki z przyciskami
-        buttonBar.setSpacing(35);//Ustawienie spacingu
-        buttonBar.getChildren().addAll(chooseX, chooseO, play, scoreBoard, exit);//Dodanie przycisków do bara na górze
+            startButton.setFont(new Font(20));
+            startButton.setOnAction(ae -> clearBoard());
+        Label labelTittle = new Label("Tic Tac Toe");
+        labelTittle.setStyle("-fx-text-fill: white;");
+        labelTittle.setFont(new Font(40));
 
-        HBox topBar = new HBox();
-        topBar.getChildren().add(labelTittle);
-        topBar.setAlignment(Pos.CENTER);// Stworzenie i dodanie labela na dole
+        BorderPane root = new BorderPane();
+            VBox bottomPanel = new VBox(5, statusLabel, startButton);
+        statusLabel.setFont(new Font(40));
+        statusLabel.setStyle("-fx-text-fill: white;");
+            bottomPanel.setAlignment(Pos.CENTER);
+            BorderPane.setMargin(bottomPanel, new Insets(20));
+            root.setBackground(new Background(backgroundTable));
 
-        borderPane.setRight(buttonBar);//Ustawienie paska z przyciskami na górze ekranu
-        borderPane.setTop(topBar);
+            VBox topPannel = new VBox(labelTittle);
+            topPannel.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(borderPane, 800, 600);//Stworzenie sceny zawierającej borderPane czyli całej tej planszy z przyciskami na górze i gridem na środku
-        primaryStage.setTitle("Wild TicTacToe");
+        root.setCenter(pane);
+        root.setBottom(bottomPanel);
+        root.setTop(topPannel);
+
+        root.setMargin(pane, new Insets(25));
+        root.setMaxWidth(750);
+        root.setMaxHeight(900);
+
+        Scene scene = new Scene(root, 425, 700);
+
         primaryStage.setScene(scene);
+        primaryStage.setTitle("Tic Tac Toe game");
         primaryStage.show();
-        primaryStage.setResizable(false);//Zablokowanie możliwości resize
-
     }
-//Sprawdzenie zapełnienia planszy
-    public boolean boardFilled() {
-        for (int i = 0; i < 3; i++){
-            for (int j = 0; j < 3; j++) {
-                if (cell[i][j].getPlayersIdentifier() == ' ') {
-                    return false;
-                }
+
+    private Button Cell() {
+        Button cell = new Button("");
+            cell.setPrefHeight(125);
+            cell.setPrefWidth(125);
+            cell.setFont(new Font(30));
+            BackgroundSize backgroundSize = new BackgroundSize(100, 50, true, true, true, true);
+            BackgroundImage backgroundImage = new BackgroundImage(notebookPage, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+            cell.setBackground(new Background(backgroundImage));
+            cell.setStyle("-fx-border-color: black");
+
+
+            cell.setOnAction(ae -> {
+            int clickedCellIndex = cells.indexOf(cell);
+            if (filledCells.get(clickedCellIndex)) {
+                return;
+            } else {
+                fillCell("X", clickedCellIndex);
             }
+
+            if (winningCheck("X")) {
+                statusLabel.setText("Victory");
+                blockBoard();
+                return;
+            }
+            if (isBoardFull()) {
+                statusLabel.setText("Stalemate ");
+                blockBoard();
+                return;
+            }
+
+            int aiIndex = aiLogic.compMove();
+            fillCell("O", aiIndex);
+
+            if (winningCheck("O")) {
+                statusLabel.setText("Computer's victory");
+                blockBoard();
+            }
+        });
+
+        cells.add(cell);
+        return cell;
+    }
+
+    private static void fillCell(String player, int index) {
+        cells.get(index).setText(player);
+        filledCells.set(index, true);
+    }
+
+    private static void clearBoardArray() {
+        for (int i = 0; i < 9; i++) {
+            filledCells.set(i, false);
+        }
+        releaseBoard();
+    }
+
+    private void clearBoard() {
+        cells.forEach(cell -> cell.setText(""));
+        clearBoardArray();
+        statusLabel.setText("");
+    }
+
+    private static void blockBoard() {
+        cells.forEach(cell -> cell.setDisable(true));
+    }
+
+    private static void releaseBoard() {
+        cells.forEach(cell -> cell.setDisable(false));
+    }
+
+    private static boolean isBoardFull() {
+        for (boolean cellFilled : filledCells) {
+            if (!cellFilled)
+                return false;
         }
         return true;
     }
-    public boolean isWon(char playersIdentifier) {//Sprawdzenie wygranych
-        for (int i = 0; i < 3; i++)
-            if (cell[i][0].getPlayersIdentifier() == playersIdentifier
-                    && cell[i][1].getPlayersIdentifier() == playersIdentifier
-                    && cell[i][2].getPlayersIdentifier() == playersIdentifier) {
+    private static boolean winningCheck(String playerString) {
+        for (int r = 0; r < 3; r++) {
+            if (cells.get(r * 3).getText().equals(playerString) &&
+                    cells.get(r * 3 + 1).getText().equals(playerString) &&
+                    cells.get(r * 3 + 2).getText().equals(playerString))
                 return true;
-            }
-        for (int j = 0; j < 3; j++)
-            if (cell[0][j].getPlayersIdentifier() ==  playersIdentifier
-                    && cell[1][j].getPlayersIdentifier() == playersIdentifier
-                    && cell[2][j].getPlayersIdentifier() == playersIdentifier) {
+        }
+
+        for (int c = 0; c < 3; c++) {
+            if (cells.get(c).getText().equals(playerString) &&
+                    cells.get(3 + c).getText().equals(playerString) &&
+                    cells.get(6 + c).getText().equals(playerString))
                 return true;
-            }
-        if (cell[0][0].getPlayersIdentifier() == playersIdentifier
-                && cell[1][1].getPlayersIdentifier() == playersIdentifier
-                && cell[2][2].getPlayersIdentifier() == playersIdentifier) {
-            return true;
         }
-        if (cell[0][2].getPlayersIdentifier() == playersIdentifier
-                && cell[1][1].getPlayersIdentifier() == playersIdentifier
-                && cell[2][0].getPlayersIdentifier() == playersIdentifier) {
+
+        if (cells.get(0).getText().equals(playerString) &&
+                cells.get(4).getText().equals(playerString) &&
+                cells.get(8).getText().equals(playerString))
             return true;
-        }
+
+        if (cells.get(2).getText().equals(playerString) &&
+                cells.get(4).getText().equals(playerString) &&
+                cells.get(6).getText().equals(playerString))
+            return true;
+
         return false;
     }
-    public class Cell extends StackPane {
-        private char playersIdentifier = ' ';//Stworzenie pustego znaku
-        public Text text = new Text();
-        public Cell() {//Tworzę metodę Cell która w konstruktorze ustawia kolor granic, rozmiar i akcję wywołaną po kliknięciu myszką
-            setStyle("-fx-border-color: black");
-            this.setPrefSize(2000, 2000);
-            this.setOnMouseClicked(e -> handleMouseClick());
-        }
-        public char getPlayersIdentifier() {//Zwracanie identyfikatora gracza
-            return playersIdentifier;
-        }
-        public void playersMove(char c) {
-            playersIdentifier = c;
-            text.setFont(Font.font(96));
-            if (playersIdentifier == 'X') {
-                text.setText("X");
-                getChildren().add(text);
-            }
-        }
-        private void handleMouseClick() {
-            System.out.println("Token poczatkowy w komorce 0,0: " + cell[0][0].getPlayersIdentifier());
-            System.out.println("Tekst poczatkowy w komorce 0,0: " + cell[0][0].text.getText());
-            System.out.println("Token poczatkowy w komorce 1,1: " + cell[1][1].getPlayersIdentifier());
-            System.out.println("Tekst poczatkowy w komorce 1,1: " + cell[1][1].text.getText());
-            System.out.println("Kolej gracza: " + whichPlayersTurn);
-            System.out.println("Identyfikator gracza poczatkowy : " + playersIdentifier);
-            System.out.println("--------------------CLICK---------------------");
-            if (playersIdentifier == ' ' && whichPlayersTurn != ' ') {
-                playersMove(whichPlayersTurn);
-                System.out.println("Kolej gracza: " + whichPlayersTurn);
-                System.out.println("Identyfikator gracza: " + playersIdentifier);
-                System.out.println("pierwszy if się wykonał");
-            }
-            System.out.println("Token w komorce 0,0: " + cell[0][0].getPlayersIdentifier());
-            System.out.println("Tekst w komorce 0,0: " + cell[0][0].text.getText());
-            System.out.println("Token w komorce 1,1: " + cell[1][1].getPlayersIdentifier());
-            System.out.println("Tekst w komorce 1,1: " + cell[1][1].text.getText());
-            if (isWon(whichPlayersTurn)) {
-                lblStatus.setText(whichPlayersTurn + " Victory! Game is over.");
-                whichPlayersTurn = ' ';
-                System.out.println("Kolej gracza: " + whichPlayersTurn);
-                System.out.println("Identyfikator gracza: " + playersIdentifier);
-                System.out.println("drugi if się wykonał");
-            }
-            else if (boardFilled()) {
-                lblStatus.setText("Stalemate ! Game is over.");
-                whichPlayersTurn = ' ';
-                System.out.println("Kolej gracza: " + whichPlayersTurn);
-                System.out.println("Identyfikator gracza: " + playersIdentifier);
-                System.out.println("trzeci else if się wykonał");
-            }
-            else {
-                whichPlayersTurn = (whichPlayersTurn == 'X') ? 'O' : 'X';//Jeśli czyj ruch to X to zmiana na 'O', jeśli false to zmiana na 'X'
-                lblStatus.setText("Player " + whichPlayersTurn + " turn.");//Wyświetla czyj ruch
-                System.out.println("Kolej gracza: " + whichPlayersTurn);
-                System.out.println("Identyfikator gracza: " + playersIdentifier);
-                System.out.println("czwarty else się wykonał");
-            }
 
-            if (playersIdentifier == ' ' && whichPlayersTurn != ' '){
-                ComputersMove computersMove = new ComputersMove();
-                computersMove.move(playersIdentifier);
-                System.out.println("Kolej gracza: " + whichPlayersTurn);
-                System.out.println("Identyfikator gracza: " + playersIdentifier);
-                System.out.println("piąty if się wykonał");
-            }
-        }
+    public interface computerMoves {
+        int compMove();
     }
-    public class ComputersMove extends Cell{
-        private void move(char identifierFromCellMethod){
-            if(identifierFromCellMethod == '0'){
-                System.out.println("poczatek computersMove");
-                Random random = new Random();
-                int r1 = random.nextInt(3);
-                int r2 = random.nextInt(3);
-                text.setFont(Font.font(96));
-                cell[r1][r2].text.setText("0");
-                getChildren().add(text);
-                System.out.println("koniec computersMove");
+
+    class Computer implements computerMoves {
+        @Override
+        public int compMove() {
+            Random r1 = new Random();
+
+            int aiIndex = 0;
+            while (filledCells.get(aiIndex)) {
+                aiIndex = r1.nextInt(8);
             }
+            return aiIndex;
         }
     }
     public static void main(String[] args) {
-        launch(args);
+        Application.launch(args);
     }
 }
-
