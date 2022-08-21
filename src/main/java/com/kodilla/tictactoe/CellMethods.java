@@ -1,16 +1,11 @@
 package com.kodilla.tictactoe;
 
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
 
 import static com.kodilla.tictactoe.TicTacToe2.filledCells;
 import static com.kodilla.tictactoe.TicTacToe2.cells;
 
 public class CellMethods {
-    public Image notebookPage = new Image("file:src/main/resources/Notebook_page.jpg");
     public Label statusLabel;
 
 
