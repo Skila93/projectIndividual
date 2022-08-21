@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
 
 public class TicTacToe2 extends Application {
     public static List<Button> cells = new ArrayList<>();
@@ -26,7 +26,7 @@ public class TicTacToe2 extends Application {
 
     private Image background = new Image("file:src/main/resources/Table_tictactoe.jpg");
     public Image notebookPage = new Image("file:src/main/resources/Notebook_page.jpg");
-    CellMethods cellisko = new CellMethods();
+    CellMethods cell2 = new CellMethods();
 
 
     public TicTacToe2() {
@@ -36,7 +36,7 @@ public class TicTacToe2 extends Application {
         for (int i = 0; i < 9; i++) {
             filledCells.add(false);
         }
-        cellisko.clearBoardArray();
+        cell2.clearBoardArray();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class TicTacToe2 extends Application {
 
 
         startButton.setFont(new Font(20));
-        startButton.setOnAction(ae -> cellisko.clearBoard());
+        startButton.setOnAction(ae -> cell2.clearBoard());
         Label labelTittle = new Label("Tic Tac Toe");
         labelTittle.setStyle("-fx-text-fill: white;");
         labelTittle.setFont(new Font(40));
@@ -104,26 +104,26 @@ public class TicTacToe2 extends Application {
             if (filledCells.get(clickedCellIndex)) {
                 return;
             } else {
-                cellisko.fillCell("X", clickedCellIndex);
+                cell2.fillCell("X", clickedCellIndex);
             }
 
-            if (cellisko.winningCheck("X")) {
+            if (cell2.winningCheck("X")) {
                 statusLabel.setText("Victory");
-                cellisko.blockBoard();
+                cell2.blockBoard();
                 return;
             }
-            if (cellisko.isBoardFull()) {
+            if (cell2.isBoardFull()) {
                 statusLabel.setText("Stalemate ");
-                cellisko.blockBoard();
+                cell2.blockBoard();
                 return;
             }
 
             int aiIndex = aiLogic.compMove();
-            cellisko.fillCell("O", aiIndex);
+            cell2.fillCell("O", aiIndex);
 
-            if (cellisko.winningCheck("O")) {
+            if (cell2.winningCheck("O")) {
                 statusLabel.setText("Computer's victory");
-                cellisko.blockBoard();
+                cell2.blockBoard();
             }
         });
 
@@ -132,68 +132,3 @@ public class TicTacToe2 extends Application {
         return cell;
     }
 }
-/*
-    private static void fillCell(String player, int index) {
-        cells.get(index).setText(player);
-        filledCells.set(index, true);
-    }
-
-    private static void clearBoardArray() {
-        for (int i = 0; i < 9; i++) {
-            filledCells.set(i, false);
-        }
-        releaseBoard();
-    }
-
-    private void clearBoard() {
-        cells.forEach(cell -> cell.setText(""));
-        clearBoardArray();
-        statusLabel.setText("");
-    }
-
-    private static void blockBoard() {
-        cells.forEach(cell -> cell.setDisable(true));
-    }
-
-    private static void releaseBoard() {
-        cells.forEach(cell -> cell.setDisable(false));
-    }
-
-    private static boolean isBoardFull() {
-        for (boolean cellFilled : filledCells) {
-            if (!cellFilled)
-                return false;
-        }
-        return true;
-    }
-    private static boolean winningCheck(String playerString) {
-        for (int r = 0; r < 3; r++) {
-            if (cells.get(r * 3).getText().equals(playerString) &&
-                    cells.get(r * 3 + 1).getText().equals(playerString) &&
-                    cells.get(r * 3 + 2).getText().equals(playerString))
-                return true;
-        }
-
-        for (int c = 0; c < 3; c++) {
-            if (cells.get(c).getText().equals(playerString) &&
-                    cells.get(3 + c).getText().equals(playerString) &&
-                    cells.get(6 + c).getText().equals(playerString))
-                return true;
-        }
-
-        if (cells.get(0).getText().equals(playerString) &&
-                cells.get(4).getText().equals(playerString) &&
-                cells.get(8).getText().equals(playerString))
-            return true;
-
-        if (cells.get(2).getText().equals(playerString) &&
-                cells.get(4).getText().equals(playerString) &&
-                cells.get(6).getText().equals(playerString))
-            return true;
-
-        return false;
-    }
-    public static void main(String[] args) {
-        Application.launch(args);
-    }
-}*/
